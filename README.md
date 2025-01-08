@@ -8,8 +8,8 @@
 	  + Use DVC (Data Version Control) to version control a dataset used in your project.
 	  + Show how to revert to a previous version of the dataset.
 ## Deliverables:
-	•	MLflow experiment logs with different runs and their results. 
-	•	A DVC repository showing different versions of the dataset. 
+	• MLflow experiment logs with different runs and their results. 
+	• A DVC repository showing different versions of the dataset. 
 
 # Instructions
 ## Install Required Tools
