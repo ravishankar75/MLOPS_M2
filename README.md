@@ -22,13 +22,13 @@
   + Start the MLFlow UI for experiment tracking:
 
 ## DVC commands
-dvc init
-dvc add X_train.csv X_test.csv y_train.csv y_test.csv
-git add X_train.csv.dvc X_test.csv.dvc y_train.csv.dvc y_test.csv.dvc .dvc/
-git commit -m "Track data with DVC"
+dvc init  
+dvc add X_train.csv X_test.csv y_train.csv y_test.csv  
+git add X_train.csv.dvc X_test.csv.dvc y_train.csv.dvc y_test.csv.dvc .dvc/  
+git commit -m "Track data with DVC"  
 
 ## MLFlow commands
-mlflow ui
+mlflow ui  
 
 ## Run GitHub Actions
-Push changes to the GitHub repository, and the CI/CD pipeline will run the updated workflow.
+Push changes to the GitHub repository, and the CI/CD pipeline will run the updated workflow.  
