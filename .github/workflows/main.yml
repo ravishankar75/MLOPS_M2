@@ -1,0 +1,58 @@
+name: CI/CD Pipeline with DVC and MLFlow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install Dependencies
+        run: pip install pylint
+      - name: Run Linter
+        run: pylint **/*.py
+
+  train:
+    name: Train Model
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install Dependencies
+        run: pip install scikit-learn pandas joblib dvc mlflow
+      - name: Pull Data with DVC
+        run: dvc pull
+      - name: Train Model
+        run: python train_model.py
+
+  test:
+    name: Test Model
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install Dependencies
+        run: pip install scikit-learn pandas joblib
+      - name: Pull Data with DVC
+        run: dvc pull
+      - name: Run Tests
+        run: python test_model.py
