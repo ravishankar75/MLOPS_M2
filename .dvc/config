@@ -1,0 +1,4 @@
+[core]
+    remote = mlops
+['remote "mlops"']
+    url = /tmp/dvcstore
