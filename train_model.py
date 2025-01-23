@@ -12,6 +12,7 @@ from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 
+import mlflow
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -23,64 +24,40 @@ def train_model():
     X_test = pd.read_csv('X_test.csv')
     y_test = pd.read_csv('y_test.csv')
     
-     
-    # Logistic Regression model
-    logistic_model = LogisticRegression()
-    logistic_model.fit(X_train, y_train)
+    # Define solvers to tune
+    classifier__solver = ['newton-cg', 'lbfgs', 'liblinear']
 
-    # Decision Tree model
-    tree_model = DecisionTreeClassifier()
-    tree_model.fit(X_train, y_train)
+    # Set MLflow experiment name
+    mlflow.set_experiment("Logistic Regression Solver Tuning")
 
-    # Predictions
-    logistic_predictions = logistic_model.predict(X_test)
-    tree_predictions = tree_model.predict(X_test)
+    # Start experimenting
+    for solver in classifier__solver:
+        with mlflow.start_run(run_name=f"Solver: {solver}"):
+            try:
+                # Train Logistic Regression model
+                model = LogisticRegression(solver=solver, random_state=42, max_iter=1000)
+                model.fit(X_train, y_train)
 
-    # Evaluate models
-    logistic_accuracy = accuracy_score(y_test, logistic_predictions)
-    tree_accuracy = accuracy_score(y_test, tree_predictions)
+                # Predict and evaluate
+                y_pred = model.predict(X_test)
+                acc = accuracy_score(y_test, y_pred)
 
-    print("Logistic Regression Accuracy:", logistic_accuracy)
-    print("Decision Tree Accuracy:", tree_accuracy)
+                # Log parameters and metrics
+                mlflow.log_param("solver", solver)
+                mlflow.log_metric("accuracy", acc)
+                
+                # Log the dataset file as an artifact
+                mlflow.log_artifact("X_train.csv", artifact_path="data")
+                
+                # Log model
+                mlflow.sklearn.log_model(model, "model")
+                
+                print(f"Solver: {solver} | Accuracy: {acc}")
 
-    # Build K-Nearest Neighbors (K-NN), Support Vector Machine (SVM),
-    # Naive Bayesian, Random Forest, and Adaboost
-
-
-    # Initialize classifiers
-    knn_model = KNeighborsClassifier()
-    svm_model = SVC()
-    naive_bayes_model = GaussianNB()
-    random_forest_model  = RandomForestClassifier()
-    adaboost_model  = AdaBoostClassifier()
-
-    # Train classifiers
-    knn_model.fit(X_train, y_train)
-    svm_model.fit(X_train, y_train)
-    naive_bayes_model.fit(X_train, y_train)
-    random_forest_model.fit(X_train, y_train)
-    adaboost_model.fit(X_train, y_train)
-
-    # Predictions
-    knn_pred = knn_model.predict(X_test)
-    svm_pred = svm_model.predict(X_test)
-    nb_pred = naive_bayes_model.predict(X_test)
-    rf_pred = random_forest_model.predict(X_test)
-    adaboost_pred = adaboost_model.predict(X_test)
-
-    # Calculate accuracies
-    knn_accuracy = accuracy_score(y_test, knn_pred)
-    svm_accuracy = accuracy_score(y_test, svm_pred)
-    nb_accuracy = accuracy_score(y_test, nb_pred)
-    rf_accuracy = accuracy_score(y_test, rf_pred)
-    adaboost_accuracy = accuracy_score(y_test, adaboost_pred)
-
-    # Print accuracies
-    print("K-Nearest Neighbors (KNN) Accuracy:", knn_accuracy)
-    print("Support Vector Machine (SVM) Accuracy:", svm_accuracy)
-    print("Naive Bayes Accuracy:", nb_accuracy)
-    print("Random Forest Accuracy:", rf_accuracy)
-    print("AdaBoost Accuracy:", adaboost_accuracy)
+            except Exception as e:
+                print(f"Solver {solver} failed with error: {e}")
+                mlflow.log_param("solver", solver)
+                mlflow.log_metric("error", 1)
 
 
 if __name__ == "__main__":
