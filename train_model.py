@@ -13,6 +13,8 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 
 import mlflow
+import joblib
+
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -58,6 +60,9 @@ def train_model():
                 print(f"Solver {solver} failed with error: {e}")
                 mlflow.log_param("solver", solver)
                 mlflow.log_metric("error", 1)
+        
+        # Save model
+        joblib.dump(model, f"{solver}.pkl")
 
 
 if __name__ == "__main__":
